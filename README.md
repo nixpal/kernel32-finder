@@ -1,4 +1,6 @@
-## This topic is about two new methods to find kernel32 base address.
+
+## **** Shellcoding 101 ****
+## This page I'm presenting two new methods to find kernel32 base address.
 #### All rights reserved to the author of this article.
 #### Author : Tarek Ahmed
 
@@ -31,16 +33,10 @@ In this method a return address of one of the kernel32 api calls will be retriev
 
 ### How it's found ? 
 
-Step 1: 
-
- The .text section of the program will be parsed until an instruction " call dword ptr[]" is found.
+Step 1: The .text section of the program will be parsed until an instruction " call dword ptr[]" is found.
  
-Step 2:
-
- Once the instruction is found, the pointer will be derefrenced and the address it's pointing to will be verified if it starts with 0x7 or not.
+Step 2: Once the instruction is found, the pointer will be derefrenced and the address it's pointing to will be verified if it starts with 0x7 or not.
  
-Step 3:
-
- If it starts with the 0x7, the same process from the previous method will be used to verify if the DLL file is kernel32. Most likely it will be.
+Step 3: If it starts with the 0x7, the same process from the previous method will be used to verify if the DLL file is kernel32. Most likely it will be.
 
 
