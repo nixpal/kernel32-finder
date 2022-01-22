@@ -1,7 +1,7 @@
 
 ## **** Shellcoding 101 ****
 ## This page I'm presenting two new methods to find kernel32 base address.
-#### All rights reserved to the author of this article.
+#### All rights reserved to the author of the code.
 #### Author : Tarek Ahmed
 
 
@@ -40,3 +40,6 @@ Step 2: Once the instruction is found, the pointer will be derefrenced and the a
 Step 3: If it starts with the 0x7, the same process from the previous method will be used to verify if the DLL file is kernel32. Most likely it will be.
 
 
+
+#### Thank you.
+#### Happy Shellcoding.
