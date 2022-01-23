@@ -1,6 +1,6 @@
 
 ## **** Shellcoding 101 ****
-## This page I'm presenting two new methods to find kernel32 base address.
+## In this page I'm presenting two new methods to find kernel32 base address.
 #### All rights reserved to the author of the code.
 #### Author : Tarek Ahmed
 
