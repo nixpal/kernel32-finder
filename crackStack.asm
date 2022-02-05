@@ -95,7 +95,7 @@ checkAddress :
 
 	xor eax, eax; Return 0 if no exception.
 
-	jmp short cleanup
+	jmp short cleanseh
 
 	; Exception handler entry point
 	xor eax, eax
@@ -104,7 +104,7 @@ checkAddress :
 	mov esp, dword ptr ss : [esp]
 
 
-cleanup :
+cleanseh :
 	pop dword ptr fs : [edi]
 	add esp, 4
 	pop ebp
